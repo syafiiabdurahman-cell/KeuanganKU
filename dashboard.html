@@ -1,0 +1,1922 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dashboard — Investify</title>
+
+    <link
+        rel="stylesheet"
+        href="css/dashboard.css"
+    >
+
+    <!-- =========================
+         FIX HISTORY MODAL
+    ========================== -->
+
+    <style>
+
+        /* =========================
+           HISTORY MODAL
+        ========================== */
+
+        #historyModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        #historyModal .history-modal {
+            width: min(600px, 100%);
+            max-height: 90vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        #historyModal #historyList {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+            width: 100%;
+            box-sizing: border-box;
+            padding-bottom: 10px;
+        }
+
+        /* =========================
+           HISTORY ITEM
+        ========================== */
+
+        #historyModal .history-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* =========================
+           HISTORY ACTION
+        ========================== */
+
+        .history-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+
+        .history-actions button {
+            border: none;
+            background: #f3f4f6;
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            transition: 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-actions button:hover {
+            transform: translateY(-1px);
+            background: #e5e7eb;
+        }
+
+        .edit-transaction {
+            color: #2563eb;
+        }
+
+        .delete-transaction {
+            color: #dc2626;
+        }
+
+        /* =========================
+           SCROLLBAR
+        ========================== */
+
+        #historyModal .history-modal::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #historyModal .history-modal::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+        }
+
+        /* =========================
+           MOBILE
+        ========================== */
+
+        @media (max-width: 600px) {
+
+            #historyModal {
+                padding: 12px;
+                align-items: center;
+            }
+
+            #historyModal .history-modal {
+                width: 100%;
+                max-height: 90vh;
+                border-radius: 20px;
+            }
+
+            #historyModal .history-item {
+                gap: 8px;
+            }
+
+            .history-actions {
+                gap: 5px;
+            }
+
+            .history-actions button {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         NAVBAR
+    ========================== -->
+
+    <header class="dashboard-nav">
+
+        <div class="logo">
+            Investify
+        </div>
+
+        <button
+            class="profile-btn"
+            type="button"
+        >
+            A
+        </button>
+
+    </header>
+
+
+
+    <!-- =========================
+         MAIN DASHBOARD
+    ========================== -->
+
+    <main class="dashboard">
+
+
+        <!-- GREETING -->
+
+        <section class="greeting">
+
+            <p>
+                Selamat datang kembali 👋
+            </p>
+
+            <h1>
+                Mari tumbuhkan<br>
+                investasimu.
+            </h1>
+
+        </section>
+
+
+
+        <!-- =========================
+             PORTFOLIO
+        ========================== -->
+
+        <section class="portfolio-card">
+
+            <div class="portfolio-top">
+
+                <div>
+
+                    <p class="label">
+                        Total Portfolio
+                    </p>
+
+                    <h2 id="totalPortfolio">
+                        Rp0
+                    </h2>
+
+                </div>
+
+                <span class="profit">
+                    Portfolio saat ini
+                </span>
+
+            </div>
+
+
+            <div class="chart">
+
+    <div class="chart-header">
+        <div>
+            <h3>Perkembangan Investasi</h3>
+            <p>Riwayat investasi kamu</p>
+        </div>
+
+        <select id="chartPeriod">
+            <option value="7">7 Hari</option>
+            <option value="30" selected>30 Hari</option>
+            <option value="90">90 Hari</option>
+        </select>
+    </div>
+
+    <div class="chart-wrapper">
+        <canvas id="investmentChart"></canvas>
+    </div>
+
+</div>
+
+
+            <div class="portfolio-info">
+
+                <div>
+
+                    <span>
+                        Modal
+                    </span>
+
+                    <strong id="totalCapital">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Keuntungan
+                    </span>
+
+                    <strong id="totalProfit">
+                        Rp0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =========================
+     STATISTIK BULANAN
+========================== -->
+
+<section class="monthly-stats">
+
+    <div class="monthly-stats-header">
+        <div>
+            <p class="label">Statistik Bulanan</p>
+            <h3 id="monthlyStatsTitle">
+                Bulan Ini
+            </h3>
+        </div>
+    </div>
+
+
+    <div class="monthly-stats-grid">
+
+        <div class="monthly-stat-card">
+            <span>Investasi</span>
+            <strong id="monthlyInvestment">
+                Rp0
+            </strong>
+        </div>
+
+
+        <div class="monthly-stat-card">
+            <span>Pengeluaran</span>
+            <strong id="monthlyExpense">
+                Rp0
+            </strong>
+        </div>
+
+
+        <div class="monthly-stat-card">
+            <span>Transaksi</span>
+            <strong id="monthlyTransactions">
+                0
+            </strong>
+        </div>
+
+
+        <div class="monthly-stat-card">
+            <span>Hari Aktif</span>
+            <strong id="monthlyActiveDays">
+                0
+            </strong>
+        </div>
+
+    </div>
+
+</section>
+
+        <!-- =========================
+             WEEKLY PROGRESS
+        ========================== -->
+
+        <section class="section">
+
+            <div class="section-header">
+
+                <div>
+
+                    <p class="label">
+                        Progress Minggu Ini
+                    </p>
+
+                    <h2>
+
+                        <span id="weeklyProgress">
+                            Rp0
+                        </span>
+
+                        <span>
+                            / Rp50.000
+                        </span>
+
+                    </h2>
+
+                </div>
+
+
+                <span
+                    class="progress-percent"
+                    id="progressPercent"
+                >
+                    0%
+                </span>
+
+            </div>
+
+
+            <div class="progress-bar">
+
+                <div
+                    class="progress-fill"
+                    id="progressFill"
+                ></div>
+
+            </div>
+
+
+            <p
+                class="progress-text"
+                id="progressText"
+            >
+                Belum ada investasi minggu ini.
+            </p>
+
+        </section>
+
+
+
+        <!-- =========================
+             QUICK ACTION
+        ========================== -->
+
+        <section class="quick-action">
+
+            <button
+                class="add-investment"
+                type="button"
+            >
+
+                <span>
+                    ＋
+                </span>
+
+
+                <div>
+
+                    <strong>
+                        Catat Investasi
+                    </strong>
+
+                    <small>
+                        Tambahkan setoran baru
+                    </small>
+
+                </div>
+
+            </button>
+
+        </section>
+
+
+
+        <!-- =========================
+             STATS
+        ========================== -->
+
+        <section class="stats">
+
+
+            <div class="stat-card">
+
+                <span>
+                    🔥
+                </span>
+
+                <p>
+                    Streak
+                </p>
+
+                <strong id="streak">
+                    0 minggu
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    📈
+                </span>
+
+                <p>
+                    Total Deposit
+                </p>
+
+                <strong id="totalDeposit">
+                    Rp0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    💸
+                </span>
+
+                <p>
+                    Total Pengeluaran
+                </p>
+
+                <strong id="totalExpense">
+                    Rp0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <span>
+                    🎯
+                </span>
+
+                <p>
+                    Target Mingguan
+                </p>
+
+                <strong>
+                    Rp50.000
+                </strong>
+
+            </div>
+
+
+        </section>
+
+
+
+        <!-- =========================
+             SALDO SAYA
+        ========================== -->
+
+        <section class="balance-section">
+
+
+            <div class="section-header">
+
+                <div>
+
+                    <span class="section-label">
+                        KEUANGAN
+                    </span>
+
+                    <h2>
+                        Saldo Saya
+                    </h2>
+
+                </div>
+
+            </div>
+
+
+            <div class="balance-card">
+
+
+                <div class="balance-item">
+
+                    <span>
+                        💵 Cash
+                    </span>
+
+                    <strong id="cashBalance">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+                <div class="balance-item">
+
+                    <span>
+                        🏦 Bank
+                    </span>
+
+                    <strong id="bankBalance">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+                <div class="balance-item">
+
+                    <span>
+                        📱 E-Wallet
+                    </span>
+
+                    <strong id="walletBalance">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+                <div class="balance-total">
+
+                    <span>
+                        Total Saldo
+                    </span>
+
+                    <strong id="totalBalance">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+            </div>
+
+
+            <button
+                type="button"
+                class="set-balance-button"
+                id="setBalanceButton"
+            >
+                ⚙️ Atur Saldo Sekarang
+            </button>
+
+
+        </section>
+
+
+
+        <!-- =========================
+             TOTAL KEKAYAAN
+        ========================== -->
+
+        <section class="portfolio-card">
+
+            <div class="portfolio-top">
+
+                <div>
+
+                    <p class="label">
+                        Total Kekayaan
+                    </p>
+
+                    <h2 id="totalWealth">
+                        Rp0
+                    </h2>
+
+                </div>
+
+                <span class="profit">
+                    Uang + Investasi
+                </span>
+
+            </div>
+
+
+            <div class="portfolio-info">
+
+                <div>
+
+                    <span>
+                        Uang Tersedia
+                    </span>
+
+                    <strong id="wealthBalance">
+                        Rp0
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Investasi
+                    </span>
+
+                    <strong id="wealthInvestment">
+                        Rp0
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =========================
+             RECENT ACTIVITY
+        ========================== -->
+
+        <section class="section recent">
+
+            <div class="section-header">
+
+                <h2>
+                    Aktivitas Terbaru
+                </h2>
+
+
+                <button
+                    type="button"
+                    id="viewHistoryButton"
+                >
+                    Lihat semua
+                </button>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =========================
+         MOBILE NAVIGATION
+    ========================== -->
+
+    <nav class="bottom-nav">
+
+        <a class="active">
+
+            <span>
+                ⌂
+            </span>
+
+            Home
+
+        </a>
+
+
+        <a>
+
+            <span>
+                ◉
+            </span>
+
+            Portfolio
+
+        </a>
+
+
+        <button
+            class="add-btn"
+            type="button"
+        >
+            +
+        </button>
+
+
+        <a>
+
+            <span>
+                ◷
+            </span>
+
+            Progress
+
+        </a>
+
+    </nav>
+
+
+
+    <!-- ==================================================
+         MODAL CATAT TRANSAKSI
+    =================================================== -->
+
+    <div
+        class="modal-overlay"
+        id="investmentModal"
+    >
+
+        <div class="investment-modal">
+
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="label">
+                        Transaksi Baru
+                    </p>
+
+                    <h2>
+                        Catat Transaksi
+                    </h2>
+
+                </div>
+
+
+                <button
+                    class="close-modal"
+                    id="closeInvestmentModal"
+                    type="button"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+
+            <form id="investmentForm">
+
+
+                <div class="form-group">
+
+                    <label for="transactionType">
+                        Jenis Transaksi
+                    </label>
+
+                    <select
+                        id="transactionType"
+                        required
+                    >
+
+                        <option value="investment">
+                            📈 Investasi
+                        </option>
+
+                        <option value="expense">
+                            💸 Pengeluaran
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="amount">
+                        Nominal
+                    </label>
+
+                    <input
+                        type="number"
+                        id="amount"
+                        placeholder="Contoh: 50000"
+                        min="1"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="fundSource">
+                        Sumber Dana
+                    </label>
+
+                    <select
+                        id="fundSource"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih sumber dana
+                        </option>
+
+                        <option value="cash">
+                            💵 Cash
+                        </option>
+
+                        <option value="bank">
+                            🏦 Bank
+                        </option>
+
+                        <option value="wallet">
+                            📱 E-Wallet
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label
+                        for="product"
+                        id="productLabel"
+                    >
+                        Produk Investasi
+                    </label>
+
+                    <select
+                        id="product"
+                        required
+                    >
+
+                        <option value="">
+                            Pilih produk
+                        </option>
+
+                        <option value="Bahana Likuid Syariah">
+                            Bahana Likuid Syariah
+                        </option>
+
+                        <option value="Majoris Pasar Uang Syariah">
+                            Majoris Pasar Uang Syariah
+                        </option>
+
+                        <option value="Produk Lain">
+                            Produk Lain
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="date">
+                        Tanggal
+                    </label>
+
+                    <input
+                        type="date"
+                        id="date"
+                        required
+                    >
+
+                </div>
+
+
+
+                <div class="form-group">
+
+                    <label for="note">
+                        Catatan
+                    </label>
+
+                    <input
+                        type="text"
+                        id="note"
+                        placeholder="Contoh: Investasi mingguan"
+                    >
+
+                </div>
+
+
+
+                <button
+                    type="submit"
+                    class="save-investment"
+                >
+                    Simpan Transaksi
+                </button>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         MODAL ATUR SALDO
+    =================================================== -->
+
+    <div
+        class="modal-overlay"
+        id="balanceModal"
+    >
+
+        <div class="investment-modal">
+
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="label">
+                        KEUANGAN
+                    </p>
+
+                    <h2>
+                        Atur Saldo Sekarang
+                    </h2>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="close-modal"
+                    id="closeBalanceModal"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="initialCash">
+                    💵 Cash
+                </label>
+
+                <input
+                    type="number"
+                    id="initialCash"
+                    min="0"
+                    placeholder="Contoh: 100000"
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="initialBank">
+                    🏦 Bank
+                </label>
+
+                <input
+                    type="number"
+                    id="initialBank"
+                    min="0"
+                    placeholder="Contoh: 500000"
+                >
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label for="initialWallet">
+                    📱 E-Wallet
+                </label>
+
+                <input
+                    type="number"
+                    id="initialWallet"
+                    min="0"
+                    placeholder="Contoh: 100000"
+                >
+
+            </div>
+
+
+
+            <button
+                type="button"
+                id="saveBalanceButton"
+                class="save-investment"
+            >
+                Simpan Saldo
+            </button>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ==================================================
+         MODAL RIWAYAT TRANSAKSI
+    =================================================== -->
+
+    <div
+        class="modal-overlay"
+        id="historyModal"
+    >
+
+        <div class="investment-modal history-modal">
+
+
+            <div class="modal-header">
+
+                <div>
+
+                    <p class="label">
+                        KEUANGANGUE
+                    </p>
+
+                    <h2>
+                        Riwayat Transaksi
+                    </h2>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="close-modal"
+                    id="closeHistoryModal"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+
+            <!-- FILTER -->
+
+            <div class="form-group">
+
+                <label for="historyFilter">
+                    Filter transaksi
+                </label>
+
+
+                <select id="historyFilter">
+
+                    <option value="all">
+                        Semua transaksi
+                    </option>
+
+                    <option value="investment">
+                        📈 Investasi
+                    </option>
+
+                    <option value="expense">
+                        💸 Pengeluaran
+                    </option>
+
+                </select>
+
+            </div>
+
+
+
+            <!-- LIST HISTORY -->
+
+            <div id="historyList">
+
+                <p class="progress-text">
+                    Belum ada transaksi.
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+         JAVASCRIPT UTAMA
+    ========================== -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+
+
+
+    <!-- ==================================================
+         HISTORY SCRIPT
+    =================================================== -->
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const historyButton =
+                document.getElementById("viewHistoryButton");
+
+            const historyModal =
+                document.getElementById("historyModal");
+
+            const closeHistoryButton =
+                document.getElementById("closeHistoryModal");
+
+            const historyList =
+                document.getElementById("historyList");
+
+            const historyFilter =
+                document.getElementById("historyFilter");
+
+
+            /* =========================
+               FORMAT RUPIAH
+            ========================== */
+
+            function historyRupiah(number) {
+
+                return new Intl.NumberFormat("id-ID", {
+                    style: "currency",
+                    currency: "IDR",
+                    maximumFractionDigits: 0
+                }).format(Number(number) || 0);
+
+            }
+
+
+            /* =========================
+               AMBIL TRANSAKSI
+            ========================== */
+
+            function getHistoryTransactions() {
+
+                try {
+
+                    return JSON.parse(
+                        localStorage.getItem("investifyTransactions")
+                    ) || [];
+
+                } catch (error) {
+
+                    console.error(
+                        "Gagal membaca transaksi:",
+                        error
+                    );
+
+                    return [];
+
+                }
+
+            }
+
+
+            /* =========================
+               RENDER HISTORY
+            ========================== */
+
+            function renderHistory() {
+
+                const transactions =
+                    getHistoryTransactions();
+
+                const filter =
+                    historyFilter
+                        ? historyFilter.value
+                        : "all";
+
+
+                let filteredTransactions =
+                    transactions.filter(function (transaction) {
+
+                        const type =
+                            transaction.type || "investment";
+
+                        if (filter === "all") {
+                            return true;
+                        }
+
+                        return type === filter;
+
+                    });
+
+
+                /* TERBARU DI ATAS */
+
+                filteredTransactions.sort(function (a, b) {
+
+                    const dateA =
+                        new Date(
+                            a.createdAt || a.date || 0
+                        ).getTime();
+
+                    const dateB =
+                        new Date(
+                            b.createdAt || b.date || 0
+                        ).getTime();
+
+                    return dateB - dateA;
+
+                });
+
+
+                /* KOSONG */
+
+                if (filteredTransactions.length === 0) {
+
+                    historyList.innerHTML = `
+                        <p class="progress-text">
+                            Belum ada transaksi.
+                        </p>
+                    `;
+
+                    return;
+
+                }
+
+
+                /* RENDER */
+
+                historyList.innerHTML =
+                    filteredTransactions
+                        .map(function (transaction) {
+
+                            const type =
+                                transaction.type || "investment";
+
+                            const isExpense =
+                                type === "expense";
+
+
+                            const icon =
+                                isExpense
+                                    ? "💸"
+                                    : "📈";
+
+
+                            const typeName =
+                                isExpense
+                                    ? "Pengeluaran"
+                                    : "Investasi";
+
+
+                            let sourceName =
+                                "Tidak diketahui";
+
+
+                            if (
+                                transaction.fundSource === "cash"
+                            ) {
+
+                                sourceName = "💵 Cash";
+
+                            } else if (
+                                transaction.fundSource === "bank"
+                            ) {
+
+                                sourceName = "🏦 Bank";
+
+                            } else if (
+                                transaction.fundSource === "wallet"
+                            ) {
+
+                                sourceName = "📱 E-Wallet";
+
+                            }
+
+
+                            const sign =
+                                isExpense
+                                    ? "-"
+                                    : "+";
+
+
+                            return `
+
+                                <div class="history-item">
+
+                                    <div class="history-icon">
+                                        ${icon}
+                                    </div>
+
+
+                                    <div class="history-info">
+
+                                        <strong>
+                                            ${typeName}
+                                        </strong>
+
+                                        <span>
+                                            ${transaction.product || "Transaksi"}
+                                        </span>
+
+                                        <small>
+                                            ${sourceName}
+                                        </small>
+
+                                        <small>
+                                            📅 ${transaction.date || "-"}
+                                        </small>
+
+                                        ${
+                                            transaction.note
+                                                ? `
+                                                    <small>
+                                                        📝 ${transaction.note}
+                                                    </small>
+                                                  `
+                                                : ""
+                                        }
+
+                                    </div>
+
+
+                                    <strong class="history-amount">
+                                        ${sign}${historyRupiah(transaction.amount)}
+                                    </strong>
+
+
+                                    <div class="history-actions">
+
+                                        <button
+                                            type="button"
+                                            class="edit-transaction"
+                                            data-id="${transaction.id}"
+                                            title="Edit transaksi"
+                                        >
+                                            ✏️
+                                        </button>
+
+
+                                        <button
+                                            type="button"
+                                            class="delete-transaction"
+                                            data-id="${transaction.id}"
+                                            title="Hapus transaksi"
+                                        >
+                                            🗑️
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            `;
+
+                        })
+                        .join("");
+
+            }
+
+
+            /* =========================
+               BUKA HISTORY
+            ========================== */
+
+            function openHistory() {
+
+                renderHistory();
+
+                historyModal.style.display = "flex";
+
+                document.body.style.overflow = "hidden";
+
+            }
+
+
+            /* =========================
+               TUTUP HISTORY
+            ========================== */
+
+            function closeHistory() {
+
+                historyModal.style.display = "none";
+
+                document.body.style.overflow = "";
+
+            }
+
+
+            /* =========================
+               LIHAT SEMUA
+            ========================== */
+
+            if (historyButton) {
+
+                historyButton.addEventListener(
+                    "click",
+                    openHistory
+                );
+
+            }
+
+
+            /* =========================
+               TOMBOL X
+            ========================== */
+
+            if (closeHistoryButton) {
+
+                closeHistoryButton.addEventListener(
+                    "click",
+                    closeHistory
+                );
+
+            }
+
+
+            /* =========================
+               KLIK AREA GELAP
+            ========================== */
+
+            if (historyModal) {
+
+                historyModal.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (
+                            event.target === historyModal
+                        ) {
+
+                            closeHistory();
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =========================
+               FILTER
+            ========================== */
+
+            if (historyFilter) {
+
+                historyFilter.addEventListener(
+                    "change",
+                    renderHistory
+                );
+
+            }
+
+
+            /* ==================================================
+               STEP 10A — EDIT TRANSAKSI
+            ================================================== */
+
+            if (historyList) {
+
+    historyList.addEventListener(
+        "click",
+        function (event) {
+
+            /* =========================
+               DELETE TRANSACTION
+            ========================== */
+
+            const deleteButton =
+                event.target.closest(
+                    ".delete-transaction"
+                );
+
+            if (deleteButton) {
+
+                const transactionId =
+                    Number(
+                        deleteButton.dataset.id
+                    );
+
+
+                const transactions =
+                    getHistoryTransactions();
+
+
+                const transactionIndex =
+                    transactions.findIndex(
+                        function (transaction) {
+
+                            return Number(
+                                transaction.id
+                            ) === transactionId;
+
+                        }
+                    );
+
+
+                if (transactionIndex === -1) {
+
+                    alert(
+                        "Transaksi tidak ditemukan."
+                    );
+
+                    return;
+
+                }
+
+
+                const transaction =
+                    transactions[transactionIndex];
+
+
+                const amount =
+                    Number(
+                        transaction.amount
+                    ) || 0;
+
+
+                const source =
+                    transaction.fundSource;
+
+
+
+                const confirmDelete =
+                    confirm(
+                        "Yakin ingin menghapus transaksi ini?"
+                    );
+
+
+                if (!confirmDelete) {
+
+                    return;
+
+                }
+
+
+                /* =========================
+                   KEMBALIKAN SALDO
+                ========================== */
+
+                const balanceKey =
+                    "investifyInitialBalance";
+
+
+                let balance = {};
+
+                try {
+
+                    balance =
+                        JSON.parse(
+                            localStorage.getItem(
+                                balanceKey
+                            )
+                        ) || {};
+
+                } catch (error) {
+
+                    console.error(
+                        "Balance JSON Error:",
+                        error
+                    );
+
+                    alert(
+                        "Saldo tidak dapat diproses."
+                    );
+
+                    return;
+
+                }
+
+
+                balance.cash =
+                    Number(balance.cash) || 0;
+
+                balance.bank =
+                    Number(balance.bank) || 0;
+
+                balance.wallet =
+                    Number(balance.wallet) || 0;
+
+
+                if (source === "cash") {
+
+    balance.cash += amount;
+
+} else if (source === "bank") {
+
+    balance.bank += amount;
+
+} else if (source === "wallet") {
+
+    balance.wallet += amount;
+
+} else {
+
+    // Transaksi lama/legacy yang tidak memiliki
+    // sumber dana tetap boleh dihapus.
+    // Karena sumber dana tidak diketahui,
+    // saldo tidak diubah.
+}
+
+
+                /* =========================
+                   HAPUS TRANSAKSI
+                ========================== */
+
+                transactions.splice(
+                    transactionIndex,
+                    1
+                );
+
+
+                localStorage.setItem(
+                    "investifyTransactions",
+                    JSON.stringify(
+                        transactions
+                    )
+                );
+
+
+                localStorage.setItem(
+                    balanceKey,
+                    JSON.stringify(
+                        balance
+                    )
+                );
+
+
+                alert(
+                    "Transaksi berhasil dihapus."
+                );
+
+
+                /* =========================
+                   REFRESH SEMUA DATA
+                ========================== */
+
+                window.location.reload();
+
+                return;
+
+            }
+
+
+            /* =========================
+               EDIT TRANSACTION
+            ========================== */
+
+            const editButton =
+                event.target.closest(
+                    ".edit-transaction"
+                );
+
+
+            if (!editButton) {
+
+                return;
+
+            }
+
+
+                        const transactionId =
+                            Number(
+                                editButton.dataset.id
+                            );
+
+
+                        const transactions =
+                            getHistoryTransactions();
+
+
+                        const transactionIndex =
+                            transactions.findIndex(
+                                function (transaction) {
+
+                                    return Number(
+                                        transaction.id
+                                    ) === transactionId;
+
+                                }
+                            );
+
+
+                        if (transactionIndex === -1) {
+
+                            alert(
+                                "Transaksi tidak ditemukan."
+                            );
+
+                            return;
+
+                        }
+
+
+                        const transaction =
+                            transactions[transactionIndex];
+
+
+                        const investmentModal =
+                            document.getElementById(
+                                "investmentModal"
+                            );
+
+
+                        const transactionType =
+                            document.getElementById(
+                                "transactionType"
+                            );
+
+
+                        const amountInput =
+                            document.getElementById(
+                                "amount"
+                            );
+
+
+                        const fundSource =
+                            document.getElementById(
+                                "fundSource"
+                            );
+
+
+                        const product =
+                            document.getElementById(
+                                "product"
+                            );
+
+
+                        const dateInput =
+                            document.getElementById(
+                                "date"
+                            );
+
+
+                        const noteInput =
+                            document.getElementById(
+                                "note"
+                            );
+
+
+                        /*
+                         * ISI DATA TRANSAKSI
+                         */
+
+                        if (transactionType) {
+
+                            transactionType.value =
+                                transaction.type ||
+                                "investment";
+
+                        }
+
+
+                        /*
+                         * Kita trigger perubahan tipe
+                         * supaya form ikut menyesuaikan.
+                         */
+
+                        if (transactionType) {
+
+                            transactionType.dispatchEvent(
+                                new Event("change")
+                            );
+
+                        }
+
+
+                        if (amountInput) {
+
+                            amountInput.value =
+                                transaction.amount || "";
+
+                        }
+
+
+                        if (fundSource) {
+
+                            fundSource.value =
+                                transaction.fundSource || "";
+
+                        }
+
+
+                        if (product) {
+
+                            product.value =
+                                transaction.product || "";
+
+                        }
+
+
+                        if (dateInput) {
+
+                            dateInput.value =
+                                transaction.date || "";
+
+                        }
+
+
+                        if (noteInput) {
+
+                            noteInput.value =
+                                transaction.note || "";
+
+                        }
+
+
+                        /*
+                         * SIMPAN ID YANG SEDANG DIEDIT
+                         */
+
+                        localStorage.setItem(
+                            "investifyEditingId",
+                            transaction.id
+                        );
+
+
+                        /*
+                         * TUTUP HISTORY
+                         */
+
+                        closeHistory();
+
+
+                        /*
+                         * BUKA MODAL TRANSAKSI
+                         */
+
+                        if (investmentModal) {
+
+                            investmentModal.classList.add(
+                                "active"
+                            );
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* =========================
+               ESC
+            ========================== */
+
+            document.addEventListener(
+                "keydown",
+                function (event) {
+
+                    if (
+                        event.key === "Escape" &&
+                        historyModal.style.display === "flex"
+                    ) {
+
+                        closeHistory();
+
+                    }
+
+                }
+            );
+
+        });
+
+    </script>
+
+
+</body>
+
+</html>
+```
