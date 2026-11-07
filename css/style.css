@@ -1,0 +1,36 @@
+/* Custom Scrollbar */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Micro Interactions & Animations */
+.active-scale {
+  transform: scale(0.97);
+}
+
+.iphone-mockup {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Fullscreen Mode Override */
+.fullscreen-mode #device-wrapper {
+  max-width: 100% !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fullscreen-mode #iphone-frame {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fullscreen-mode #app-screen {
+  border-radius: 0 !important;
+}
